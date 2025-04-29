@@ -204,30 +204,30 @@
   </style>
 </head>
 <body>
-  <h1>Close-Up Sword Edge Damage Simulation</h1>
-  <button onclick="reset()">Reset</button>
-  <button onclick="hit()">Hit Again</button>
+  <h1>Simulación de Daños en el Filo</h1>
+  <button onclick="reset()">Reiniciar</button>
+  <button onclick="hit()">¡Golpea!</button>
 
   <svg id="viz" width="800" height="500">
-    <text x="200" y="30" class="label">Sword A (Close-up)</text>
-    <text x="560" y="30" class="label">Sword B (Close-up)</text>
+    <text x="200" y="30" class="label">Espada A</text>
+    <text x="560" y="30" class="label">Espada B</text>
 
-    <!-- Sword A -->
+    <!-- Espada A -->
     <g id="swordA">
-      <!-- Blade -->
+      <!-- Hoja -->
       <rect x="190" y="60" width="20" height="300" class="blade"/>
       <line x1="200" y1="60" x2="200" y2="360" class="fuller"/>
       <line x1="190" y1="60" x2="190" y2="360" class="bevel"/>
       <line x1="210" y1="60" x2="210" y2="360" class="bevel"/>
-      <!-- Tip -->
+      <!-- Punta -->
       <polygon points="190,60 200,40 210,60" class="blade"/>
-      <!-- Guard -->
+      <!-- Guarda -->
       <rect x="180" y="360" width="40" height="8" class="guard"/>
-      <!-- Handle -->
+      <!-- Empuñadura -->
       <rect x="192" y="368" width="16" height="40" class="handle"/>
     </g>
 
-    <!-- Sword B -->
+    <!-- Espada B -->
     <g id="swordB">
       <rect x="550" y="60" width="20" height="300" class="blade"/>
       <line x1="560" y1="60" x2="560" y2="360" class="fuller"/>
@@ -238,7 +238,7 @@
       <rect x="552" y="368" width="16" height="40" class="handle"/>
     </g>
 
-    <!-- Edge Damage Overlays -->
+    <!-- Superposición de Daños en el Filo -->
     <path id="edgeA" class="ok"/>
     <path id="edgeB" class="ok"/>
 
@@ -251,9 +251,9 @@
   let damageMapB = Array(impactSteps).fill("none");
 
   function getDamageType(hrc) {
-    if (hrc <= 48) return "roll";
-    if (hrc >= 52) return "chip";
-    return Math.random() < 0.5 ? "chip" : "roll";
+    if (hrc <= 48) return "deformación";
+    if (hrc >= 52) return "astillamiento";
+    return Math.random() < 0.5 ? "astillamiento" : "deformación";
   }
 
   function getDamageOutcome(hrcA, hrcB) {
@@ -273,7 +273,7 @@
 
   function applyRandomDamage(hrcA, hrcB) {
     const results = getDamageOutcome(hrcA, hrcB);
-    if (results.length === 0) return "No visible damage this hit.";
+    if (results.length === 0) return "No hay daños visibles en este golpe.";
 
     let messages = [];
 
@@ -281,7 +281,7 @@
       const map = target === "A" ? damageMapA : damageMapB;
       const i = Math.floor(Math.random() * impactSteps);
       map[i] = `${type}:${severity}`;
-      messages.push(`Damage to Sword ${target}: ${type} (severity ${severity})`);
+      messages.push(`Daño en la Espada ${target}: ${type} (severidad ${severity})`);
     });
 
     return messages.join(" | ");
@@ -296,7 +296,7 @@
       if (dmg !== "none") {
         const [type, sev] = dmg.split(":");
         const severity = parseInt(sev);
-        offset = (type === "chip" ? 6 : 3) * severity;
+        offset = (type === "astillamiento" ? 6 : 3) * severity;
       }
       const y = yStart + i * step;
       const dx = side === "right" ? -offset : offset;
@@ -315,10 +315,10 @@
     edgeA.setAttribute("d", pathA);
     edgeB.setAttribute("d", pathB);
 
-    edgeA.setAttribute("class", damageMapA.some(d => d.includes("chip")) ? "fail" :
-                                damageMapA.some(d => d.includes("roll")) ? "deform" : "ok");
-    edgeB.setAttribute("class", damageMapB.some(d => d.includes("chip")) ? "fail" :
-                                damageMapB.some(d => d.includes("roll")) ? "deform" : "ok");
+    edgeA.setAttribute("class", damageMapA.some(d => d.includes("astillamiento")) ? "fail" :
+                                damageMapA.some(d => d.includes("deformación")) ? "deform" : "ok");
+    edgeB.setAttribute("class", damageMapB.some(d => d.includes("astillamiento")) ? "fail" :
+                                damageMapB.some(d => d.includes("deformación")) ? "deform" : "ok");
 
     document.getElementById("result").textContent = message;
   }
@@ -333,18 +333,14 @@
   function reset() {
     damageMapA = Array(impactSteps).fill("none");
     damageMapB = Array(impactSteps).fill("none");
-    updateEdges(parseInt(document.getElementById("hrcA").value), parseInt(document.getElementById("hrcB").value), "Simulation reset.");
+    updateEdges(parseInt(document.getElementById("hrcA").value), parseInt(document.getElementById("hrcB").value), "Simulación reiniciada.");
   }
 
   window.onload = reset;
 </script>
-  <div class="result" id="resultBox"></div>
-</div>
-
-</script>
-
 <div class="result" id="resultBox"></div>
 </div>
+
 
 <script>
   const flexibilityScale = {
