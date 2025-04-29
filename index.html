@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Steel Comparison Tool (Made with love for Historical Fencing Santa Cruz)</title>
+  <title>Steel Comparison Tool</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -172,6 +172,8 @@
         <option value="65Mn">65Mn</option>
         <option value="1566">1566</option>
         <option value="DNH7">DNH7</option>
+    </select>
+
       </select>
 
       <label id="labelCustomB" for="customB">Or Enter Custom Name for Steel B:</label>
@@ -183,7 +185,6 @@
   </div>
 
   <button class="compare-button" onclick="compareSteels()">Compare Steels</button>
-
   <title>Sword Edge Simulation</title>
   <style>
     body { font-family: sans-serif; padding: 2rem; background: #e0e0e0; }
@@ -337,16 +338,12 @@
 
   window.onload = reset;
 </script>
-
   <div class="result" id="resultBox"></div>
 </div>
 
 </script>
 
 <div class="result" id="resultBox"></div>
-</div>
-
-  <div class="result" id="resultBox"></div>
 </div>
 
 <script>
@@ -454,7 +451,6 @@ if (flexB >= 5) {
   consequences += `<p><strong>Note for ${nameB}:</strong> Very high flexibility — excellent for absorbing impact without cracking, but may experience more permanent deformation if struck repeatedly.</p>`;
 }
 
-
     resultBox.innerHTML = `
       <h3>Comparison Result</h3>
       <p><strong>Flexibility:</strong> ${nameA}: ${flexA} vs ${nameB}: ${flexB}</p>
@@ -468,7 +464,7 @@ if (flexB >= 5) {
       ${consequences}
     `;
   }
-
+</script>
 
 </body>
 </html>
