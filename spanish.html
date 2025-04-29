@@ -185,7 +185,159 @@
   </div>
 
   <button class="compare-button" onclick="compareSteels()">Comparar Aceros</button>
+<title>Sword Edge Simulation</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; background: #e0e0e0; }
+    svg { border: 1px solid #ccc; background: #fff; margin-top: 1rem; }
+    .label { font-size: 14px; fill: black; }
+    .deform { stroke: orange; fill: none; stroke-width: 2; }
+    .fail { stroke: red; fill: none; stroke-width: 2; }
+    .ok { stroke: green; fill: none; stroke-width: 2; }
 
+    .blade { fill: #bbb; stroke: #888; stroke-width: 1; }
+    .fuller { stroke: #888; stroke-width: 1; stroke-dasharray: 2,2; }
+    .bevel { stroke: #aaa; stroke-width: 1; }
+    .guard { fill: #333; }
+    .handle { fill: #222; }
+
+    input, button { margin: 0 0.5rem 0.5rem 0; }
+  </style>
+</head>
+<body>
+  <h1>Close-Up Sword Edge Damage Simulation</h1>
+  <button onclick="reset()">Reset</button>
+  <button onclick="hit()">Hit Again</button>
+
+  <svg id="viz" width="800" height="500">
+    <text x="200" y="30" class="label">Sword A (Close-up)</text>
+    <text x="560" y="30" class="label">Sword B (Close-up)</text>
+
+    <!-- Sword A -->
+    <g id="swordA">
+      <!-- Blade -->
+      <rect x="190" y="60" width="20" height="300" class="blade"/>
+      <line x1="200" y1="60" x2="200" y2="360" class="fuller"/>
+      <line x1="190" y1="60" x2="190" y2="360" class="bevel"/>
+      <line x1="210" y1="60" x2="210" y2="360" class="bevel"/>
+      <!-- Tip -->
+      <polygon points="190,60 200,40 210,60" class="blade"/>
+      <!-- Guard -->
+      <rect x="180" y="360" width="40" height="8" class="guard"/>
+      <!-- Handle -->
+      <rect x="192" y="368" width="16" height="40" class="handle"/>
+    </g>
+
+    <!-- Sword B -->
+    <g id="swordB">
+      <rect x="550" y="60" width="20" height="300" class="blade"/>
+      <line x1="560" y1="60" x2="560" y2="360" class="fuller"/>
+      <line x1="550" y1="60" x2="550" y2="360" class="bevel"/>
+      <line x1="570" y1="60" x2="570" y2="360" class="bevel"/>
+      <polygon points="550,60 560,40 570,60" class="blade"/>
+      <rect x="540" y="360" width="40" height="8" class="guard"/>
+      <rect x="552" y="368" width="16" height="40" class="handle"/>
+    </g>
+
+    <!-- Edge Damage Overlays -->
+    <path id="edgeA" class="ok"/>
+    <path id="edgeB" class="ok"/>
+
+    <text id="result" x="400" y="470" class="label" text-anchor="middle"></text>
+  </svg>
+
+<script>
+  const impactSteps = 60;
+  let damageMapA = Array(impactSteps).fill("none");
+  let damageMapB = Array(impactSteps).fill("none");
+
+  function getDamageType(hrc) {
+    if (hrc <= 48) return "roll";
+    if (hrc >= 52) return "chip";
+    return Math.random() < 0.5 ? "chip" : "roll";
+  }
+
+  function getDamageOutcome(hrcA, hrcB) {
+    const diff = Math.abs(hrcA - hrcB);
+    if (diff === 0) {
+      return Math.random() < 0.01 ? [{ target: "A", type: getDamageType(hrcA), severity: 1 }] : [];
+    }
+
+    const chance = Math.min(1, (diff - 1) * 0.2 + 0.2);
+    const outcomes = [];
+
+    if (Math.random() < chance) outcomes.push({ target: "A", type: getDamageType(hrcA), severity: Math.min(3, Math.ceil(diff / 2)) });
+    if (Math.random() < chance) outcomes.push({ target: "B", type: getDamageType(hrcB), severity: Math.min(3, Math.ceil(diff / 2)) });
+
+    return outcomes;
+  }
+
+  function applyRandomDamage(hrcA, hrcB) {
+    const results = getDamageOutcome(hrcA, hrcB);
+    if (results.length === 0) return "No visible damage this hit.";
+
+    let messages = [];
+
+    results.forEach(({ target, type, severity }) => {
+      const map = target === "A" ? damageMapA : damageMapB;
+      const i = Math.floor(Math.random() * impactSteps);
+      map[i] = `${type}:${severity}`;
+      messages.push(`Damage to Sword ${target}: ${type} (severity ${severity})`);
+    });
+
+    return messages.join(" | ");
+  }
+
+  function generateEdge(x, yStart, map, side) {
+    const step = 5;
+    let path = `M${x},${yStart}`;
+    for (let i = 0; i < map.length; i++) {
+      let offset = 0;
+      const dmg = map[i];
+      if (dmg !== "none") {
+        const [type, sev] = dmg.split(":");
+        const severity = parseInt(sev);
+        offset = (type === "chip" ? 6 : 3) * severity;
+      }
+      const y = yStart + i * step;
+      const dx = side === "right" ? -offset : offset;
+      path += ` L${x + dx},${y}`;
+    }
+    return path;
+  }
+
+  function updateEdges(hrcA, hrcB, message) {
+    const edgeA = document.getElementById("edgeA");
+    const edgeB = document.getElementById("edgeB");
+
+    const pathA = generateEdge(210, 60, damageMapA, "right");
+    const pathB = generateEdge(550, 60, damageMapB, "left");
+
+    edgeA.setAttribute("d", pathA);
+    edgeB.setAttribute("d", pathB);
+
+    edgeA.setAttribute("class", damageMapA.some(d => d.includes("chip")) ? "fail" :
+                                damageMapA.some(d => d.includes("roll")) ? "deform" : "ok");
+    edgeB.setAttribute("class", damageMapB.some(d => d.includes("chip")) ? "fail" :
+                                damageMapB.some(d => d.includes("roll")) ? "deform" : "ok");
+
+    document.getElementById("result").textContent = message;
+  }
+
+  function hit() {
+    const hrcA = parseInt(document.getElementById("hrcA").value);
+    const hrcB = parseInt(document.getElementById("hrcB").value);
+    const result = applyRandomDamage(hrcA, hrcB);
+    updateEdges(hrcA, hrcB, result);
+  }
+
+  function reset() {
+    damageMapA = Array(impactSteps).fill("none");
+    damageMapB = Array(impactSteps).fill("none");
+    updateEdges(parseInt(document.getElementById("hrcA").value), parseInt(document.getElementById("hrcB").value), "Simulation reset.");
+  }
+
+  window.onload = reset;
+</script>
   <div class="result" id="resultBox"></div>
 </div>
 
