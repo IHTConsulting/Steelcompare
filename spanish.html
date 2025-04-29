@@ -112,7 +112,7 @@
 <div class="container">
   <img src="logo.png" alt="Logo de Historical Fencing Santa Cruz" class="logo">
   
-	<button class="language-button" onclick="window.location.href='index.html'">Inglés</button>
+	<button class="language-button" onclick="window.location.href='index.html'">Change to English</button>
 
   <h2 id="title">Herramienta de Comparación de Tipos de Acero</h2>
 
@@ -143,10 +143,10 @@
       </select>
 
       <label id="labelCustomA" for="customA">O introduce un nombre personalizado para el Acero A:</label>
-      <input type="text" id="customA" placeholder="Nombre personalizado opcional...">
+      <input type="text" id="customA" placeholder="Tyrfing">
 
       <label id="labelHrcA" for="hrcA">Introduce la Dureza HRC:</label>
-      <input type="number" id="hrcA" min="0" max="70" placeholder="ej.: 58">
+      <input type="number" id="hrcA" min="0" max="100" placeholder="ej.: 52">
     </div>
 
     <div class="col">
@@ -177,10 +177,10 @@
       </select>
 
       <label id="labelCustomB" for="customB">O introduce un nombre personalizado para el Acero B:</label>
-      <input type="text" id="customB" placeholder="Nombre personalizado opcional...">
+      <input type="text" id="customB" placeholder="Ulfberth">
 
       <label id="labelHrcB" for="hrcB">Introduce la Dureza HRC:</label>
-      <input type="number" id="hrcB" min="0" max="70" placeholder="ej.: 60">
+      <input type="number" id="hrcB" min="0" max="100" placeholder="ej.: 50">
     </div>
   </div>
 
@@ -190,9 +190,9 @@
     body { font-family: sans-serif; padding: 2rem; background: #e0e0e0; }
     svg { border: 1px solid #ccc; background: #fff; margin-top: 1rem; }
     .label { font-size: 14px; fill: black; }
-    .deform { stroke: orange; fill: none; stroke-width: 2; }
-    .fail { stroke: red; fill: none; stroke-width: 2; }
-    .ok { stroke: green; fill: none; stroke-width: 2; }
+    .deform { stroke: orange; fill: none; stroke-width: 3; }
+    .fail { stroke: red; fill: none; stroke-width: 3; }
+    .ok { stroke: green; fill: none; stroke-width: 3; }
 
     .blade { fill: #bbb; stroke: #888; stroke-width: 1; }
     .fuller { stroke: #888; stroke-width: 1; stroke-dasharray: 2,2; }
@@ -262,7 +262,7 @@
       return Math.random() < 0.01 ? [{ target: "A", type: getDamageType(hrcA), severity: 1 }] : [];
     }
 
-    const chance = Math.min(1, (diff - 1) * 0.2 + 0.2);
+    const chance = Math.min(1, (diff - 1) * 0.1 + 0.1);
     const outcomes = [];
 
     if (Math.random() < chance) outcomes.push({ target: "A", type: getDamageType(hrcA), severity: Math.min(3, Math.ceil(diff / 2)) });
