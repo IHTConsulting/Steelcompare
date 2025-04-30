@@ -262,7 +262,7 @@
       return Math.random() < 0.01 ? [{ target: "A", type: getDamageType(hrcA), severity: 1 }] : [];
     }
 
-    const chance = Math.min(1, (diff - 1) * 0.1 + 0.1);
+    const chance = Math.min(1, ((diff - 1) * 0.1 + 0.1)/10);
     const outcomes = [];
 
     if (Math.random() < chance) outcomes.push({ target: "A", type: getDamageType(hrcA), severity: Math.min(3, Math.ceil(diff / 2)) });
