@@ -296,7 +296,7 @@
       if (dmg !== "none") {
         const [type, sev] = dmg.split(":");
         const severity = parseInt(sev);
-        offset = (type === "astillamiento" ? 6 : 3) * severity;
+        offset = (type === "astillamiento" ? 4 : 3) * severity;
       }
       const y = yStart + i * step;
       const dx = side === "right" ? -offset : offset;
